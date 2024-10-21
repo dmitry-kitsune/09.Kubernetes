@@ -1,6 +1,5 @@
 name: Setup KinD Cluster
 
-# Trigger the workflow when pushing to the main branch, on pull requests, or manual dispatch
 on:
   push:
     branches:
@@ -12,14 +11,14 @@ on:
 
 jobs:
   setup-kind-cluster:
-    runs-on: ubuntu-latest  # Use the latest Ubuntu runner
+    runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the code from the repository
+      # Step 1: Checkout the repository
       - name: Checkout the repository
         uses: actions/checkout@v3
 
-      # Step 2: Install KinD
+      # Step 2: Install KinD (Kubernetes in Docker)
       - name: Install KinD
         run: |
           curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
@@ -33,36 +32,16 @@ jobs:
           chmod +x ./kubectl
           sudo mv ./kubectl /usr/local/bin/kubectl
 
-      # Step 4: Create a KinD cluster
+      # Step 4: Create KinD cluster named "burlyaev-cluster"
       - name: Create KinD cluster
         run: |
           kind create cluster --name burlyaev-cluster --wait 5m
 
-      # Step 5: Set up Kubeconfig for using kubectl
+      # Step 5: Export kubeconfig for kubectl
       - name: Export kubeconfig for kubectl
         run: |
-          kind get kubeconfig --name burlyaev-cluster > $GITHUB_WORKSPACE/kubeconfig
-        env:
-          KUBECONFIG: $GITHUB_WORKSPACE/kubeconfig
-
-      # Step 6: Verify the cluster is up and running
-      - name: Verify cluster
-        run: |
-          kubectl cluster-info
-          kubectl get nodes
-        env:
-          KUBECONFIG: $GITHUB_WORKSPACE/kubeconfig
-
-      # Step 7: (Optional) Deploy a test Kubernetes resource 
-      - name: Deploy a sample application 
-        run: |
-          echo "Creating a test deployment"
-          kubectl create deployment nginx-deployment --image=nginx
-          kubectl get pods
-        env:
-          KUBECONFIG: $GITHUB_WORKSPACE/kubeconfig
-
-      # Step 8: Clean up the KinD cluster after the workflow is done
-      - name: Delete KinD cluster
-        if: always()
-        run: kind delete cluster --name burlyaev-cluster
+          echo "::set-env name=KUBECONFIG::$(kind get kubeconfig-path --name=\"burlyaev-cluster\")"
+      
+      # Step 6: Verify kubectl connection to the KinD cluster
+      - name: Get cluster info
+        run: kubectl cluster-info
