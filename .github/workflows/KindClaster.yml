@@ -60,9 +60,9 @@ jobs:
         run: kubectl describe nodes
 
       # Step 10: Get resource usage of the nodes (CPU and Memory)
-      - name: Get resource usage of the nodes
-        run: |
-          kubectl top nodes
+      #- name: Get resource usage of the nodes
+      #  run: |
+      #    kubectl top nodes
 
       # Step 11: Get all running pods in the default namespace
       - name: Get running pods
