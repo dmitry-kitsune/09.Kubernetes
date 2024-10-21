@@ -37,11 +37,11 @@ jobs:
         run: |
           kind create cluster --name burlyaev-cluster --wait 5m
 
-      # Step 5: Export kubeconfig for kubectl
-      - name: Export kubeconfig for kubectl
+      # Step 5: Set KUBECONFIG environment variable using environment file
+      - name: Set KUBECONFIG environment variable
         run: |
-          echo "::set-env name=KUBECONFIG::$(kind get kubeconfig-path --name=\"burlyaev-cluster\")"
-      
+          echo "KUBECONFIG=$(kind get kubeconfig --name burlyaev-cluster)" >> $GITHUB_ENV
+
       # Step 6: Verify kubectl connection to the KinD cluster
       - name: Get cluster info
         run: kubectl cluster-info
