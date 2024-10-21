@@ -42,7 +42,32 @@ jobs:
       #  run: |
       #    export KUBECONFIG="$(kind get kubeconfig --name burlyaev-cluster)"
       #   echo "KUBECONFIG=$KUBECONFIG" >> $GITHUB_ENV
-
+      
       # Step 6: Verify kubectl connection to the KinD cluster
       - name: Get cluster info
         run: kubectl cluster-info
+
+      # Step 7: Get Kubernetes version info
+      - name: Get Kubernetes version
+        run: kubectl version --output=json
+
+      # Step 8: Get nodes information in the cluster
+      - name: Get nodes info
+        run: kubectl get nodes -o wide
+
+      # Step 9: Describe all the nodes in the cluster for detailed info
+      - name: Describe nodes
+        run: kubectl describe nodes
+
+      # Step 10: Get resource usage of the nodes (CPU and Memory)
+      - name: Get resource usage of the nodes
+        run: |
+          kubectl top nodes
+
+      # Step 11: Get all running pods in the default namespace
+      - name: Get running pods
+        run: kubectl get pods --all-namespaces
+
+      # Step 12: Check for available namespaces
+      - name: List namespaces
+        run: kubectl get namespaces
