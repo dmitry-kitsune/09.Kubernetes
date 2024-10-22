@@ -38,10 +38,10 @@ jobs:
           minikube start --driver=docker --wait=true
           minikube status
 
-      # Step 5: Set KUBECONFIG environment variable for Minikube
-      - name: Set KUBECONFIG environment variable
-        run: |
-          echo "KUBECONFIG=$(minikube kubeconfig)" >> $GITHUB_ENV
+#      # Step 5: Set KUBECONFIG environment variable for Minikube
+#      - name: Set KUBECONFIG environment variable
+#        run: |
+#          echo "KUBECONFIG=$(minikube kubeconfig)" >> $GITHUB_ENV
 
       # Step 6: Verify kubectl connection to Minikube cluster
       - name: Get cluster info
@@ -60,8 +60,8 @@ jobs:
         run: kubectl describe nodes
 
       # Step 10: Get resource usage of the nodes (CPU and Memory)
-      - name: Get resource usage of the nodes
-        run: kubectl top nodes
+#      - name: Get resource usage of the nodes
+#        run: kubectl top nodes
 
       # Step 11: Get all running pods in the default namespace
       - name: Get running pods
