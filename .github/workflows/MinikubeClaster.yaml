@@ -1,0 +1,79 @@
+name: Setup Minikube Cluster and Gather Test Info
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  setup-minikube-cluster:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+
+      # Step 2: Install Minikube
+      - name: Install Minikube
+        run: |
+          curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+          sudo install minikube-linux-amd64 /usr/local/bin/minikube
+
+      # Step 3: Install kubectl (Kubernetes CLI)
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x ./kubectl
+          sudo mv ./kubectl /usr/local/bin/kubectl
+
+      # Step 4: Start Minikube cluster with specific Kubernetes version and wait until it is ready
+      - name: Start Minikube
+        run: |
+          sudo minikube start --driver=docker --wait=true
+          sudo minikube status
+
+      # Step 5: Set KUBECONFIG environment variable for Minikube
+      - name: Set KUBECONFIG environment variable
+        run: |
+          export KUBECONFIG=$(sudo minikube kubeconfig)
+          echo "KUBECONFIG=$KUBECONFIG" >> $GITHUB_ENV
+
+      # Step 6: Verify kubectl connection to the Minikube cluster
+      - name: Get cluster info
+        run: kubectl cluster-info
+
+      # Step 7: Get Kubernetes version info
+      - name: Get Kubernetes version
+        run: kubectl version --output=json
+
+      # Step 8: Get nodes information in the cluster
+      - name: Get nodes info
+        run: kubectl get nodes -o wide
+
+      # Step 9: Describe all the nodes in the cluster for detailed info
+      - name: Describe nodes
+        run: kubectl describe nodes
+
+      # Step 10: Get resource usage of the nodes (CPU and Memory)
+      - name: Get resource usage of the nodes
+        run: kubectl top nodes
+
+      # Step 11: Get all running pods in the default namespace
+      - name: Get running pods
+        run: kubectl get pods --all-namespaces
+
+      # Step 12: Check for available namespaces
+      - name: List namespaces
+        run: kubectl get namespaces
+
+      # Step 13: Run additional tests or commands if needed
+      - name: Custom Test Commands
+        run: |
+          # You can add custom test scripts or commands here
+          echo "Running custom tests..."
+
